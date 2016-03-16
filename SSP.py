@@ -87,5 +87,6 @@ def calcG(pi3, B, miu):
 	b = B.shape[0] # supervised information
 	s = np.dot(miu, (np.ones(b) - np.dot(B, pi.T)).T)
 	G = alpha * np.dot(pi3, pi3.T) + (1 - alpha) * s
+	return G
 
-# global variable: alpha, d, nv, nvf
+# global variable: alpha, d, nv(num_of_nodes), nvf(num_of_nodefeatures)
