@@ -42,7 +42,7 @@ print "pi first:", pi
 e = 1
 
 while e > 0.01:
-
+#*************************************************************#
 ###########################################################
 	# in loop
 	DG = nx.DiGraph()
@@ -107,8 +107,6 @@ while e > 0.01:
 
 	def get_W(i, j, k):
 		ij = 10 * (i + 1) + j + 1
-		# print "ij:", ij
-		# print "xijk:", x[12][0]
 		if ij in x:
 			result = (x[ij][k] * sumjk[i] - sumk[ij] * sumj[i][k]) / (sumjk[i] * sumjk[i])
 		else:
@@ -142,6 +140,7 @@ while e > 0.01:
 
 	G1 = alpha * np.dot(pi3, pi3.T) + (1 - alpha) * s
 ##############################################################################
+#***************************************************************************#
 	print "pi before:", pi
 	pi = pi - step_size * g_pi
 	pi /= pi.sum()
