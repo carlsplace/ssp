@@ -3,7 +3,7 @@ import numpy as np
 import math
 
 d = 0.85
-alpha = 0.7
+alpha = 0.5
 step_size = 0.1
 iteration = 0
 

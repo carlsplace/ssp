@@ -17,7 +17,7 @@ def getTransMatrix(DG):
 	return P
 
 def calcPi3(node, phi, pi):
-	"r is the reset probability vector, pi3 is an important vertor for later use"
+	# r is the reset probability vector, pi3 is an important vertor for later use
 	node_weight = {}
 	r_temp =[]
 	for key in node:
@@ -43,7 +43,7 @@ def get_W(i, j, k):
 	return result
 
 def calcGradientOmega(x, omega):
-	"complicated, holy shit..."
+	# complicated, holy shit...
 	sumjk = []
 	for i in range(1, nv+1):
 		sumjk_temp = 0
