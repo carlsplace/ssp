@@ -34,7 +34,7 @@ def calcGradientPi(pi, P, B, miu):
 	g_pi = (1 - alpha) * np.dot(P1, pi3.T).T - alpha/2 * np.dot(B.T, miu.T)
 	return g_pi
 
-def get_W(i, j, k):
+def get_W(i, j, k, sumj, sumk, sumjk):
 	ij = 10 * (i + 1) + j + 1
 	if ij in edge:
 		result = (edge[ij][k] * sumjk[i] - sumk[ij] * sumj[i][k]) / (sumjk[i] * sumjk[i])
@@ -56,9 +56,9 @@ def calcGradientOmega(edge, omega):
 	for key in edge:
 		sumk[key] = np.dot(edge[key], omega.T)
 
-	sumj = [([0] * nvf) for i in range(nv)]
+	sumj = [([0] * nef) for i in range(nv)]
 	sumj_temp = 0
-	for k in range(0, nvf):
+	for k in range(0, nef):
 		for i in range(1, nv+1):
 			sumj_temp = 0
 			for key in edge:
@@ -66,10 +66,10 @@ def calcGradientOmega(edge, omega):
 					sumj_temp += edge[key][k]
 					sumj[i-1][k] = sumj_temp
 
-	W_temp = [([0] * nvf) for i in range(nv * nv)]
+	W_temp = [([0] * nef) for i in range(nv * nv)]
 	for i in range(nv * nv):
-		for j in range(nvf):
-			W_temp[i][j] = get_W(i%10, i/10, j)
+		for j in range(nef):
+			W_temp[i][j] = get_W(i%10, i/10, j, sumj, sumk, sumjk)
 
 	W = np.array(W_temp) # W is partial derivatives
 	g_omega = (1 - alpha) * np.dot((np.kron(pi3, pi)), W)
@@ -88,6 +88,11 @@ def calcG(pi3, B, miu):
 	s = np.dot(miu, (np.ones(b) - np.dot(B, pi.T)).T)
 	G = alpha * np.dot(pi3, pi3.T) + (1 - alpha) * s
 	return G
+
+def updateVar(var, g_var, step_size):
+	var = var - step_size * g_var
+	var /= var.sum()
+	return var
 
 # global variable: alpha, d, nv(num_of_nodes), nvf(num_of_nodefeatures)
 d = 0.85
@@ -124,12 +129,31 @@ phi = np.array([0.4, 0.3, 0.3])
 
 nv = len(node) # #nodes
 nvf = len(phi) # #node features
+nef = len(omega) # #edge features
 pi = np.full(nv, 1.0/nv)
 
+e = 1
 DG = createDirectedGraph(edge, omega)
 P = getTransMatrix(DG)
 pi3 = calcPi3(node, phi, pi, P)
 G0 = calcG(pi3, B, miu)
-g_phi = calcGradientPi(pi, P, B, miu)
-g_omega =calcGradientOmega(edge, omega)
-g_phi = calcGradientPhi(pi3, node)
+while e > 0.00001:
+	g_pi = calcGradientPi(pi, P, B, miu)
+	g_omega =calcGradientOmega(edge, omega)
+	g_phi = calcGradientPhi(pi3, node)
+	pi = updateVar(pi, g_pi, step_size)
+	omega = updateVar(omega, g_omega, step_size)
+	phi = updateVar(phi, g_phi, step_size)
+	DG = createDirectedGraph(edge, omega)
+	P = getTransMatrix(DG)
+	pi3 = calcPi3(node, phi, pi, P)
+	G1 = calcG(pi3, B, miu)
+	e = abs(G1 - G0)
+	G0 = G1
+	iteration += 1
+
+print "RESULT:"
+print "pi:", pi
+print "omega:", omega
+print "phi:", phi
+print "total iteration:", iteration
