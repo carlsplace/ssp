@@ -83,7 +83,7 @@ def calcGradientPhi(pi3, node):
 	g_phi = (1 - alpha) * (1 - d) * np.dot(pi3, R)
 	return g_phi
 
-def calcG(pi3, B, miu, alpha=0.5):
+def calcG(pi3, B, miu):
 	b = B.shape[0] # supervised information
 	s = np.dot(miu, (np.ones(b) - np.dot(B, pi.T)).T)
 	G = alpha * np.dot(pi3, pi3.T) + (1 - alpha) * s
@@ -94,8 +94,9 @@ def updateVar(var, g_var, step_size):
 	var /= var.sum()
 	return var
 
-# global variable:  d, nv(num_of_nodes), nvf(num_of_nodefeatures)
+# global variable:  d, alpha,  nv(num_of_nodes), nvf(num_of_nodefeatures)
 d = 0.85
+alpha = 0.5
 step_size = 0.1
 iteration = 0
 
